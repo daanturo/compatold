@@ -1,1 +1,3 @@
 Provide (frozen) old support for Emacs 24.3 that [[https://github.com/emacs-compat/compat]] has dropped.
+
+(Maybe `compatold` wasn't a good name, it should have been something to indicate a single non-breaking range of Emacs versions instead. In the future when more old (but newer than the mentioned one) Emacs versions supports are dropped, `compat` will possibly have changed so much that a complete new package forking is necessary.)
