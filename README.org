@@ -1,0 +1,1 @@
+Provide (frozen) old support for Emacs 24.3 that [[https://github.com/emacs-compat/compat]] has dropped.
