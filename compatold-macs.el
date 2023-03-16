@@ -1,4 +1,4 @@
-;;; compat-macs.el --- Compatibility Macros           -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; compatold-macs.el --- Compatibility Macros           -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;; Copyright (C) 2021-2023 Free Software Foundation, Inc.
 
@@ -22,17 +22,17 @@
 
 ;;; Code:
 
-(defvar compat--current-version nil
+(defvar compatold--current-version nil
   "Default version to use when no explicit version was given.")
 
-(defmacro compat-declare-version (version)
+(defmacro compatold-declare-version (version)
   "Set the Emacs version that is currently being handled to VERSION."
   ;; FIXME: Avoid setting the version for any definition that might
   ;; follow, but try to restrict it to the current file/buffer.
-  (setq compat--current-version version)
+  (setq compatold--current-version version)
   nil)
 
-(defvar compat--generate-function #'compat--generate-default
+(defvar compatold--generate-function #'compatold--generate-default
   "Function used to generate compatibility code.
 The function must take six arguments: NAME, DEF-FN, INSTALL-FN,
 CHECK-FN, ATTR and TYPE.  The resulting body is constructed by
@@ -72,23 +72,23 @@ ignored:
 - :notes :: Additional notes that a developer using this
   compatibility function should keep in mind.
 
-- :prefix :: Add a `compat-' prefix to the name, and define the
+- :prefix :: Add a `compatold-' prefix to the name, and define the
   compatibility code unconditionally.
 
-TYPE is used to set the symbol property `compat-type' for NAME.")
+TYPE is used to set the symbol property `compatold-type' for NAME.")
 
-(defun compat--generate-default (name def-fn install-fn check-fn attr type)
+(defun compatold--generate-default (name def-fn install-fn check-fn attr type)
   "Generate a leaner compatibility definition.
-See `compat-generate-function' for details on the arguments NAME,
+See `compatold-generate-function' for details on the arguments NAME,
 DEF-FN, INSTALL-FN, CHECK-FN, ATTR and TYPE."
   (let* ((min-version (plist-get attr :min-version))
          (max-version (plist-get attr :max-version))
          (feature (plist-get attr :feature))
          (cond (plist-get attr :cond))
          (version (or (plist-get attr :version)
-                      compat--current-version))
+                      compatold--current-version))
          (realname (or (plist-get attr :realname)
-                       (intern (format "compat--%S" name))))
+                       (intern (format "compatold--%S" name))))
          (check (cond
                  ((or (and min-version
                            (version< emacs-version min-version))
@@ -105,7 +105,7 @@ DEF-FN, INSTALL-FN, CHECK-FN, ATTR and TYPE."
       (error "%S: Name is equal to realname" name))
     (cond
      ((and (plist-get attr :prefix) (memq type '(func macro))
-           (string-match "\\`compat-\\(.+\\)\\'" (symbol-name name))
+           (string-match "\\`compatold-\\(.+\\)\\'" (symbol-name name))
            (let* ((actual-name (intern (match-string 1 (symbol-name name))))
                   (body (funcall install-fn actual-name version)))
              (when (and (version<= version emacs-version)
@@ -137,13 +137,13 @@ DEF-FN, INSTALL-FN, CHECK-FN, ATTR and TYPE."
             `(eval-after-load ,feature `(funcall ',(lambda () ,body)))
           body))))))
 
-(defun compat--define-function (type name arglist docstring rest)
+(defun compatold--define-function (type name arglist docstring rest)
   "Generate compatibility code for a function NAME.
 TYPE is one of `func', for functions and `macro' for macros, and
 `advice' ARGLIST is passed on directly to the definition, and
 DOCSTRING is prepended with a compatibility note.  REST contains
 the remaining definition, that may begin with a property list of
-attributes (see `compat-generate-common')."
+attributes (see `compatold-generate-common')."
   (let ((oldname name) (body rest))
     (while (keywordp (car body))
       (setq body (cddr body)))
@@ -155,8 +155,8 @@ attributes (see `compat-generate-common')."
         (delq (assq 'pure (car body)) (car body))))
     ;; Check if we want an explicitly prefixed function
     (when (plist-get rest :prefix)
-      (setq name (intern (format "compat-%s" name))))
-    (funcall compat--generate-function
+      (setq name (intern (format "compatold-%s" name))))
+    (funcall compatold--generate-function
      name
      (lambda (realname version)
        `(,(cond
@@ -180,7 +180,7 @@ attributes (see `compat-generate-common')."
                    (format
                     "%s for `%S', defined in Emacs %s.  \
 If this is not documented on your system, you can check \
-`(compat) Emacs %s' for more details."
+`(compatold) Emacs %s' for more details."
                      type oldname version version)
                  (format
                   "code %s for `%S'"
@@ -212,11 +212,11 @@ If this is not documented on your system, you can check \
         ((eq type 'advice) t)))
      rest type)))
 
-(defmacro compat-defun (name arglist docstring &rest rest)
+(defmacro compatold-defun (name arglist docstring &rest rest)
   "Define NAME with arguments ARGLIST as a compatibility function.
 The function must be documented in DOCSTRING.  REST may begin
 with a plist, that is interpreted by the macro but not passed on
-to the actual function.  See `compat-generate-common' for a
+to the actual function.  See `compatold-generate-common' for a
 listing of attributes.
 
 The definition will only be installed, if the version this
@@ -227,43 +227,43 @@ attribute, is greater than the current Emacs version."
                            [&rest keywordp sexp]
                            def-body))
            (doc-string 3) (indent 2))
-  (compat--define-function 'func name arglist docstring rest))
+  (compatold--define-function 'func name arglist docstring rest))
 
-(defmacro compat-defmacro (name arglist docstring &rest rest)
+(defmacro compatold-defmacro (name arglist docstring &rest rest)
   "Define NAME with arguments ARGLIST as a compatibility macro.
 The macro must be documented in DOCSTRING.  REST may begin
 with a plist, that is interpreted by this macro but not passed on
-to the actual macro.  See `compat-generate-common' for a
+to the actual macro.  See `compatold-generate-common' for a
 listing of attributes.
 
 The definition will only be installed, if the version this
 function was defined in, as indicated by the `:version'
 attribute, is greater than the current Emacs version."
-  (declare (debug compat-defun) (doc-string 3) (indent 2))
-  (compat--define-function 'macro name arglist docstring rest))
+  (declare (debug compatold-defun) (doc-string 3) (indent 2))
+  (compatold--define-function 'macro name arglist docstring rest))
 
-(defmacro compat-advise (name arglist docstring &rest rest)
+(defmacro compatold-advise (name arglist docstring &rest rest)
   "Define NAME with arguments ARGLIST as a compatibility advice.
 The advice function must be documented in DOCSTRING.  REST may
 begin with a plist, that is interpreted by this macro but not
 passed on to the actual advice function.  See
-`compat-generate-common' for a listing of attributes.  The advice
+`compatold-generate-common' for a listing of attributes.  The advice
 wraps the old definition, that is accessible via using the symbol
 `oldfun'.
 
 The advice will only be installed, if the version this function
 was defined in, as indicated by the `:version' attribute, is
 greater than the current Emacs version."
-  (declare (debug compat-defun) (doc-string 3) (indent 2))
-  (compat--define-function 'advice name (cons 'oldfun arglist) docstring rest))
+  (declare (debug compatold-defun) (doc-string 3) (indent 2))
+  (compatold--define-function 'advice name (cons 'oldfun arglist) docstring rest))
 
-(defmacro compat-defvar (name initval docstring &rest attr)
+(defmacro compatold-defvar (name initval docstring &rest attr)
   "Declare compatibility variable NAME with initial value INITVAL.
 The obligatory documentation string DOCSTRING must be given.
 
 The remaining arguments ATTR form a plist, modifying the
-behaviour of this macro.  See `compat-generate-common' for a
-listing of attributes.  Furthermore, `compat-defvar' also handles
+behaviour of this macro.  See `compatold-generate-common' for a
+listing of attributes.  Furthermore, `compatold-defvar' also handles
 the attribute `:local' that either makes the variable permanent
 local with a value of `permanent' or just buffer local with any
 non-nil value."
@@ -272,8 +272,8 @@ non-nil value."
   ;; Check if we want an explicitly prefixed function
   (let ((oldname name))
     (when (plist-get attr :prefix)
-      (setq name (intern (format "compat-%s" name))))
-    (funcall compat--generate-function
+      (setq name (intern (format "compatold-%s" name))))
+    (funcall compatold--generate-function
      name
      (lambda (realname version)
        (let ((localp (plist-get attr :local)))
@@ -301,5 +301,5 @@ non-nil value."
        `(not (boundp ',name)))
      attr 'variable)))
 
-(provide 'compat-macs)
-;;; compat-macs.el ends here
+(provide 'compatold-macs)
+;;; compatold-macs.el ends here

@@ -1,4 +1,4 @@
-;;; compat-24.el --- Compatibility Layer for Emacs 24.4  -*- lexical-binding: t; -*-
+;;; compatold-24.el --- Compatibility Layer for Emacs 24.4  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021-2023 Free Software Foundation, Inc.
 
@@ -23,22 +23,22 @@
 ;; Only load this library if you need to use one of the following
 ;; functions:
 ;;
-;; - `compat-='
-;; - `compat-<'
-;; - `compat->'
-;; - `compat-<='
-;; - `compat->='
+;; - `compatold-='
+;; - `compatold-<'
+;; - `compatold->'
+;; - `compatold-<='
+;; - `compatold->='
 ;; - `split-string'.
 
 ;;; Code:
 
-(eval-when-compile (load "compat-macs.el" nil t t))
+(eval-when-compile (load "compatold-macs.el" nil t t))
 
-(compat-declare-version "24.4")
+(compatold-declare-version "24.4")
 
 ;;;; Defined in data.c
 
-(compat-defun = (number-or-marker &rest numbers-or-markers)
+(compatold-defun = (number-or-marker &rest numbers-or-markers)
   "Handle multiple arguments."
   :prefix t
   (catch 'fail
@@ -48,7 +48,7 @@
       (setq number-or-marker (pop numbers-or-markers)))
     t))
 
-(compat-defun < (number-or-marker &rest numbers-or-markers)
+(compatold-defun < (number-or-marker &rest numbers-or-markers)
   "Handle multiple arguments."
   :prefix t
   (catch 'fail
@@ -58,7 +58,7 @@
       (setq number-or-marker (pop numbers-or-markers)))
     t))
 
-(compat-defun > (number-or-marker &rest numbers-or-markers)
+(compatold-defun > (number-or-marker &rest numbers-or-markers)
   "Handle multiple arguments."
   :prefix t
   (catch 'fail
@@ -68,7 +68,7 @@
       (setq number-or-marker (pop numbers-or-markers)))
     t))
 
-(compat-defun <= (number-or-marker &rest numbers-or-markers)
+(compatold-defun <= (number-or-marker &rest numbers-or-markers)
   "Handle multiple arguments."
   :prefix t
   (catch 'fail
@@ -78,7 +78,7 @@
       (setq number-or-marker (pop numbers-or-markers)))
     t))
 
-(compat-defun >= (number-or-marker &rest numbers-or-markers)
+(compatold-defun >= (number-or-marker &rest numbers-or-markers)
   "Handle multiple arguments."
   :prefix t
   (catch 'fail
@@ -87,7 +87,7 @@
         (throw 'fail nil)))
     t))
 
-(compat-defun bool-vector-exclusive-or (a b &optional c)
+(compatold-defun bool-vector-exclusive-or (a b &optional c)
   "Return A ^ B, bitwise exclusive or.
 If optional third argument C is given, store result into C.
 A, B, and C must be bool vectors of the same length.
@@ -110,7 +110,7 @@ Return the destination vector if it changed or nil otherwise."
         (aset dest i val)))
     (if c (and changed c) dest)))
 
-(compat-defun bool-vector-union (a b &optional c)
+(compatold-defun bool-vector-union (a b &optional c)
   "Return A | B, bitwise or.
 If optional third argument C is given, store result into C.
 A, B, and C must be bool vectors of the same length.
@@ -133,7 +133,7 @@ Return the destination vector if it changed or nil otherwise."
         (aset dest i val)))
     (if c (and changed c) dest)))
 
-(compat-defun bool-vector-intersection (a b &optional c)
+(compatold-defun bool-vector-intersection (a b &optional c)
   "Return A & B, bitwise and.
 If optional third argument C is given, store result into C.
 A, B, and C must be bool vectors of the same length.
@@ -156,7 +156,7 @@ Return the destination vector if it changed or nil otherwise."
         (aset dest i val)))
     (if c (and changed c) dest)))
 
-(compat-defun bool-vector-set-difference (a b &optional c)
+(compatold-defun bool-vector-set-difference (a b &optional c)
   "Return A &~ B, set difference.
 If optional third argument C is given, store result into C.
 A, B, and C must be bool vectors of the same length.
@@ -179,7 +179,7 @@ Return the destination vector if it changed or nil otherwise."
         (aset dest i val)))
     (if c (and changed c) dest)))
 
-(compat-defun bool-vector-not (a &optional b)
+(compatold-defun bool-vector-not (a &optional b)
   "Compute ~A, set complement.
 If optional second argument B is given, store result into B.
 A and B must be bool vectors of the same length.
@@ -195,7 +195,7 @@ Return the destination vector."
       (aset dest i (not (aref a i))))
     dest))
 
-(compat-defun bool-vector-subsetp (a b)
+(compatold-defun bool-vector-subsetp (a b)
   "Return t if every t value in A is also t in B, nil otherwise.
 A and B must be bool vectors of the same length."
   (unless (bool-vector-p a)
@@ -210,7 +210,7 @@ A and B must be bool vectors of the same length."
         (throw 'not-subset nil)))
     t))
 
-(compat-defun bool-vector-count-consecutive (a b i)
+(compatold-defun bool-vector-count-consecutive (a b i)
   "Count how many consecutive elements in A equal B starting at I.
 A is a bool vector, B is t or nil, and I is an index into A."
   (unless (bool-vector-p a)
@@ -223,7 +223,7 @@ A is a bool vector, B is t or nil, and I is an index into A."
       (setq i (1+ i)))
     (- i n)))
 
-(compat-defun bool-vector-count-population (a)
+(compatold-defun bool-vector-count-population (a)
   "Count how many elements in A are t.
 A is a bool vector.  To count A's nil elements, subtract the
 return value from A's length."
@@ -238,7 +238,7 @@ return value from A's length."
 ;;;; Defined in subr.el
 
 ;;* UNTESTED
-(compat-defmacro with-eval-after-load (file &rest body)
+(compatold-defmacro with-eval-after-load (file &rest body)
   "Execute BODY after FILE is loaded.
 FILE is normally a feature name, but it can also be a file name,
 in case that file does not provide any feature.  See `eval-after-load'
@@ -248,7 +248,7 @@ for more details about the different forms of FILE and their semantics."
   ;; `eval-after-load' is used to preserve compatibility with 24.3.
   `(eval-after-load ,file `(funcall ',,`(lambda () ,@body))))
 
-(compat-defun special-form-p (object)
+(compatold-defun special-form-p (object)
   "Non-nil if and only if OBJECT is a special form."
   (if (and (symbolp object) (fboundp object))
       (setq object (condition-case nil
@@ -256,7 +256,7 @@ for more details about the different forms of FILE and their semantics."
                      (void-function nil))))
   (and (subrp object) (eq (cdr (subr-arity object)) 'unevalled)))
 
-(compat-defun macrop (object)
+(compatold-defun macrop (object)
   "Non-nil if and only if OBJECT is a macro."
   (let ((def (condition-case nil
                  (indirect-function object)
@@ -265,7 +265,7 @@ for more details about the different forms of FILE and their semantics."
       (or (eq 'macro (car def))
           (and (autoloadp def) (memq (nth 4 def) '(macro t)))))))
 
-(compat-defun string-suffix-p (suffix string  &optional ignore-case)
+(compatold-defun string-suffix-p (suffix string  &optional ignore-case)
   "Return non-nil if SUFFIX is a suffix of STRING.
 If IGNORE-CASE is non-nil, the comparison is done without paying
 attention to case differences."
@@ -274,7 +274,7 @@ attention to case differences."
          (eq t (compare-strings suffix nil nil
                                 string start-pos nil ignore-case)))))
 
-(compat-defun split-string (string &optional separators omit-nulls trim)
+(compatold-defun split-string (string &optional separators omit-nulls trim)
   "Extend `split-string' by a TRIM argument.
 The remaining arguments STRING, SEPARATORS and OMIT-NULLS are
 handled just as with `split-string'."
@@ -292,7 +292,7 @@ handled just as with `split-string'."
                     token)))
     (if omit-nulls (delete "" trimmed) trimmed)))
 
-(compat-defun delete-consecutive-dups (list &optional circular)
+(compatold-defun delete-consecutive-dups (list &optional circular)
   "Destructively remove `equal' consecutive duplicates from LIST.
 First and last elements are considered consecutive if CIRCULAR is
 non-nil."
@@ -309,7 +309,7 @@ non-nil."
   list)
 
 ;;* UNTESTED
-(compat-defun define-error (name message &optional parent)
+(compatold-defun define-error (name message &optional parent)
   "Define NAME as a new error signal.
 MESSAGE is a string that will be output to the echo area if such an error
 is signaled without being caught by a `condition-case'.
@@ -332,7 +332,7 @@ Defaults to `error'."
 ;;;; Defined in minibuffer.el
 
 ;;* UNTESTED
-(compat-defun completion-table-with-cache (fun &optional ignore-case)
+(compatold-defun completion-table-with-cache (fun &optional ignore-case)
   "Create dynamic completion table from function FUN, with cache.
 This is a wrapper for `completion-table-dynamic' that saves the last
 argument-result pair from FUN, so that several lookups with the
@@ -342,17 +342,17 @@ relatively slow operation, such as calling an external process.
 
 When IGNORE-CASE is non-nil, FUN is expected to be case-insensitive."
   (let* (last-arg last-result
-         (new-fun
-          (lambda (arg)
-            (if (and last-arg (string-prefix-p last-arg arg ignore-case))
-                last-result
-              (prog1
-                  (setq last-result (funcall fun arg))
-                (setq last-arg arg))))))
+                  (new-fun
+                   (lambda (arg)
+                     (if (and last-arg (string-prefix-p last-arg arg ignore-case))
+                         last-result
+                       (prog1
+                           (setq last-result (funcall fun arg))
+                         (setq last-arg arg))))))
     (completion-table-dynamic new-fun)))
 
 ;;* UNTESTED
-(compat-defun completion-table-merge (&rest tables)
+(compatold-defun completion-table-merge (&rest tables)
   "Create a completion table that collects completions from all TABLES."
   (lambda (string pred action)
     (cond
@@ -379,7 +379,7 @@ When IGNORE-CASE is non-nil, FUN is expected to be case-insensitive."
 ;;;; Defined in subr-x.el
 
 ;;* UNTESTED
-(compat-advise require (feature &rest args)
+(compatold-advise require (feature &rest args)
   "Allow for Emacs 24.3 to require the inexistent FEATURE subr-x."
   :version "24.4"
   ;; As the compatibility advise around `require` is more a hack than
@@ -395,7 +395,7 @@ When IGNORE-CASE is non-nil, FUN is expected to be case-insensitive."
         'subr-x)
     (apply oldfun feature args)))
 
-(compat-defun hash-table-keys (hash-table)
+(compatold-defun hash-table-keys (hash-table)
   "Return a list of keys in HASH-TABLE."
   (let (values)
     (maphash
@@ -403,7 +403,7 @@ When IGNORE-CASE is non-nil, FUN is expected to be case-insensitive."
      hash-table)
     values))
 
-(compat-defun hash-table-values (hash-table)
+(compatold-defun hash-table-values (hash-table)
   "Return a list of values in HASH-TABLE."
   (let (values)
     (maphash
@@ -411,29 +411,29 @@ When IGNORE-CASE is non-nil, FUN is expected to be case-insensitive."
      hash-table)
     values))
 
-(compat-defun string-empty-p (string)
+(compatold-defun string-empty-p (string)
   "Check whether STRING is empty."
   (string= string ""))
 
-(compat-defun string-join (strings &optional separator)
+(compatold-defun string-join (strings &optional separator)
   "Join all STRINGS using SEPARATOR.
 Optional argument SEPARATOR must be a string, a vector, or a list of
 characters; nil stands for the empty string."
   (mapconcat #'identity strings separator))
 
-(compat-defun string-blank-p (string)
+(compatold-defun string-blank-p (string)
   "Check whether STRING is either empty or only whitespace.
 The following characters count as whitespace here: space, tab, newline and
 carriage return."
   (string-match-p "\\`[ \t\n\r]*\\'" string))
 
-(compat-defun string-remove-prefix (prefix string)
+(compatold-defun string-remove-prefix (prefix string)
   "Remove PREFIX from STRING if present."
   (if (string-prefix-p prefix string)
       (substring string (length prefix))
     string))
 
-(compat-defun string-remove-suffix (suffix string)
+(compatold-defun string-remove-suffix (suffix string)
   "Remove SUFFIX from STRING if present."
   (if (string-suffix-p suffix string)
       (substring string 0 (- (length string) (length suffix)))
@@ -442,7 +442,7 @@ carriage return."
 ;;;; Defined in faces.el
 
 ;;* UNTESTED
-(compat-defun face-spec-set (face spec &optional spec-type)
+(compatold-defun face-spec-set (face spec &optional spec-type)
   "Set the FACE's spec SPEC, define FACE, and recalculate its attributes.
 See `defface' for the format of SPEC.
 
@@ -490,5 +490,5 @@ function for defining FACE and recalculating its attributes."
   (dolist (frame (frame-list))
     (face-spec-recalc face frame)))
 
-(provide 'compat-24)
-;;; compat-24.el ends here
+(provide 'compatold-24)
+;;; compatold-24.el ends here
